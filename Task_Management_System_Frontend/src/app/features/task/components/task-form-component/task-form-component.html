@@ -1,0 +1,154 @@
+
+
+
+<p-panel [ariaDisabled]="isLoading()" class="bottom-padding-header-0">
+
+    <ng-template #icons>
+        <div class="flex justify-end items-center gap-2">
+            <p-button label="New Task" icon="pi pi-plus" [disabled]="isLoading()" (onClick)="onNewTask()" />
+            @if(isEditMode() && taskId() != null){
+            <p-button label="Cancel" [disabled]="isLoading()" severity="secondary" icon="pi pi-times" (onClick)="onCancelEdit()" />
+            }
+            @else{
+            <p-button label="Edit Task" [disabled]="isEditMode() || taskId() == null || isLoading()" severity="secondary"
+                icon="pi pi-pencil" (onClick)="onEditTask()" />
+            }
+        </div>
+    </ng-template>
+
+    <ng-template #header>
+        <div class="flex items-center gap-2 ">
+        </div>
+    </ng-template>
+    <p-divider />
+    <div class="view-container">
+       @if(isLoading()){
+         <div class="loading-container">
+            <p-progress-spinner  ariaLabel="loading" />
+        </div>
+       }
+        @if(!isEditMode() && taskId() != null){
+        <div>
+            <h3 class="m-0">{{this.taskViewModel.title}}</h3>
+
+            <div class="grid grid-nogutter">
+                <div class="col-4 flex align-items-center gap-2">
+                    <i class="pi pi-clock" style="font-size: 1rem"></i>
+                    <p>Created Time</p>
+                </div>
+                <div class="col-8">
+                    <p>{{this.taskViewModel.createdDateTime | date: 'medium'}}</p>
+                </div>
+            </div>
+
+            <div class="grid grid-nogutter">
+                <div class="col-4 flex align-items-center gap-2">
+                    <i class="pi pi-calendar-clock" style="font-size: 1rem"></i>
+                    <p>Due Time</p>
+                </div>
+                <div class="col-8">
+                    <p>{{this.taskViewModel.dueDateTime | date: 'medium'}}</p>
+                </div>
+            </div>
+
+            <div class="grid grid-nogutter">
+                <div class="col-4 flex align-items-center gap-2">
+                    <i class="pi pi-calendar-clock" style="font-size: 1rem"></i>
+                    <p>Updated Time</p>
+                </div>
+                <div class="col-8">
+                    <p>{{(this.taskViewModel.updatedDateTime | date: 'medium') ?? "N/A"}}</p>
+                </div>
+            </div>
+
+            <div class="grid grid-nogutter">
+                <div class="col-4 flex align-items-center gap-2">
+                    <i class="pi pi-star" style="font-size: 1rem"></i>
+                    <p>Task Status</p>
+                </div>
+                <div class="col-8">
+                    <div class="flex gap-2 align-items-center">
+                        <p>{{this.taskViewModel.currentTaskStatus}}</p>
+                        @if(taskViewModel.currentTaskStatusId != TaskStatusEnum.Completed){
+                            <p-button severity="info" size="small" (onClick)="onChangeTaskStatus($event)" label="Mark as {{ this.taskViewModel.nextTaskStatus }}"></p-button>
+
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <p-panel header="Description" class="border-none" style="background-color: #f5f6f7;">
+                <p class=" text-justify">
+                    {{this.taskViewModel.description ?? "N/A"}}
+                </p>
+            </p-panel>
+
+            <p-divider />
+
+            <p-timeline [value]="timelineEvents">
+                <ng-template #opposite let-event>
+                    <small class="text-surface-500 dark:text-surface-400">{{ event.timeStamp | date:'medium' }}
+                    </small>
+                </ng-template>
+                <ng-template #content let-event>
+                    <p class="m-0">{{ event.taskStatus }}</p>
+                </ng-template>
+            </p-timeline>
+        </div>
+        }
+        @else{
+        <form [formGroup]="taskForm" (ngSubmit)="onSubmitTask()">
+            <div class="field">
+                <label>Task Title<span class="required-mark">*</span></label>
+                <input type="text" formControlName="title" pInputText placeholder="Enter Task Title"
+                    class="text-base w-full"
+                    [ariaInvalid]="taskForm.get('title')?.invalid && taskForm.get('title')?.touched">
+                    @if(!taskForm.get("title")?.valid && (this.taskForm.get("title")?.dirty || this.taskForm.get("title")?.touched)){
+                    <div class="text-left text-red-500 text-sm mt-1">
+                        Task Title is required.
+                    </div>
+                }
+            </div>
+
+            <div class="field">
+                <label>Task Description</label>
+                <textarea rows="5" formControlName="description" pTextarea placeholder="Enter Task Description"
+                    [autoResize]="true" class="text-base w-full"></textarea>
+            </div>
+
+            <div class="field">
+                <label>Due Date Time<span class="required-mark">*</span></label>
+                <p-datepicker [showClear]="true" [showTime]="true" formControlName="dueDateTime"
+                    placeholder="Select Due Date Time" class="w-full"
+                    [ariaInvalid]="taskForm.get('dueDateTime')?.invalid && (taskForm.get('dueDateTime')?.touched || taskForm.get('dueDateTime')?.touched)"/>
+                @if(!taskForm.get("dueDateTime")?.valid && (this.taskForm.get("dueDateTime")?.touched || this.taskForm.get("dueDateTime")?.dirty)){
+                    <div class="text-left text-red-500 text-sm mt-1">
+                        Due Date Time is required.
+                    </div>
+                }
+            </div>
+
+            <div class="field flex justify-end gap-2 mt-2">
+                <p-button label="Save" class="action-button" [loading]="isSaving()" type="submit"></p-button>
+
+                @if(taskId() != null){
+                <p-button label="Cancel" class="action-button" type="button" severity="secondary" (click)="onCancelEdit()"></p-button>
+                <p-button label="Delete" class="action-button" [loading]="isDeleting()" type="button" severity="danger"
+                    (click)="onDeleteTask($event)"></p-button>
+
+                }
+                @else{
+                <p-button label="Clear" class="action-button" type="button" severity="secondary" (click)="onNewTask()"></p-button>
+                }
+            </div>
+        </form>
+        }
+    </div>
+
+
+
+</p-panel>
+
+<p-toast />
+
+<p-confirmdialog />

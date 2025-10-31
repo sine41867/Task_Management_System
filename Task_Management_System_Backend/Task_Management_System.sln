@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36414.22
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TMS_API", "WebApplication1\TMS_API.csproj", "{9435C77F-E1AF-417D-BB29-FAF753364CA4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TMS_DAL", "TMS_DAL\TMS_DAL.csproj", "{190CE9C5-8B30-488E-8129-ACF5E4AA1380}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9435C77F-E1AF-417D-BB29-FAF753364CA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9435C77F-E1AF-417D-BB29-FAF753364CA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9435C77F-E1AF-417D-BB29-FAF753364CA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9435C77F-E1AF-417D-BB29-FAF753364CA4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{190CE9C5-8B30-488E-8129-ACF5E4AA1380}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{190CE9C5-8B30-488E-8129-ACF5E4AA1380}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{190CE9C5-8B30-488E-8129-ACF5E4AA1380}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{190CE9C5-8B30-488E-8129-ACF5E4AA1380}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5797CF02-E13A-4501-9CE7-375B8ACD656C}
+	EndGlobalSection
+EndGlobal

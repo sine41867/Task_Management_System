@@ -1,0 +1,12 @@
+<p-menubar >
+    <ng-template #start>
+            <p class="m-0" style="font-weight: bold;">Task Management System</p>
+    </ng-template>
+   
+    <ng-template #end>
+        <div class="flex  items-center gap-2">
+            <p-splitbutton [label]="firstName()" icon="pi pi-user" [model]="items" />
+        </div>
+    </ng-template>
+</p-menubar>
+

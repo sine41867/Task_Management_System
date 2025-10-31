@@ -1,0 +1,121 @@
+<p-panel header="Filters" collapsed="true" [toggleable]="true">
+    <form [formGroup]="filterForm" (ngSubmit)="onFilter()" class="mt-2">
+        <div class="grid">
+            <div class="col-12 md:col-4">
+                <div class="field mb-0">
+                    <label>Task Title</label>
+                    <input formControlName="title" type="text" pInputText placeholder="Enter Task Title" class="text-base w-full">
+                </div>
+            </div>
+
+            <div class="col-12 md:col-4">
+                <div class="field mb-0">
+                    <label>Description</label>
+                    <input formControlName="description" type="text" pInputText placeholder="Enter Description" class="text-base w-full">
+                </div>
+            </div>
+
+            <div class="col-12 md:col-4">
+                <div class="field mb-0">
+                    <label>Task Status</label>
+                    <p-select  formControlName="currentTaskStatusId" [options]="taskStatusList" optionLabel="Text" optionValue="Id" placeholder="Select Task Status" class="w-full" [showClear]="true">
+                    </p-select>
+                </div>
+            </div>
+
+            <div class="col-12 md:col-4">
+                <div class="field mb-0">
+                    <label>Created Date Time From</label>
+                    <p-datepicker [showClear]="true" [showTime]="true" formControlName="fromCreatedDateTime" placeholder="Select Created Date Time From" class="w-full"/>
+                </div>
+            </div>
+
+             <div class="col-12 md:col-4">
+                <div class="field mb-0">
+                    <label>Created Date Time To</label>
+                    <p-datepicker [showClear]="true" [showTime]="true" formControlName="toCreatedDateTime" placeholder="Select Created Date Time To" class="w-full"/>
+                </div>
+            </div>
+
+            <div class="col-12 md:col-4">
+                <div class="field mb-0">
+                    <label>Due Date Time From</label>
+                    <p-datepicker [showClear]="true" [showTime]="true" formControlName="fromDueDateTime" placeholder="Select Due Date Time From" class="w-full"/>
+                </div>
+            </div>
+
+             <div class="col-12 md:col-4">
+                <div class="field mb-0">
+                    <label>Due Date Time To</label>
+                    <p-datepicker [showClear]="true" [showTime]="true" formControlName="toDueDateTime" placeholder="Select Due Date Time To" class="w-full"/>
+                </div>
+            </div>
+        </div>
+
+        <div class="field flex justify-end gap-2 mt-2">
+            <p-button label="Filter" class="action-button" type="submit"></p-button>
+            <p-button label="Clear" class="action-button" type="button" (click)="onClearFilter()" severity="secondary" ></p-button>
+        </div>
+
+    </form>
+</p-panel>
+
+<p-panel class="mt-3 top-padding-header-0">
+    <p-table
+        [tableStyle]="{'min-width': '50rem'}"
+        class="mt-0"
+        [value]="taskList"
+        [paginator]="true"
+        [rows]="length()"
+        [first]="start()"
+        [rowsPerPageOptions]="[5, 10, 20, 50,100]"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [totalRecords]="totalRecords()"
+        stripedRows="true"
+        (onLazyLoad)="onLazyLoad($event)"
+        lazy="true"
+        [loading]="loading()"
+        [rowHover]="true"
+        
+    >
+        <ng-template #header>
+            <tr>
+                <th>Title</th>
+                <th>Status</th>
+                <th>Description</th>
+                <th>Due Date Time</th>
+                <th>Created Date Time</th>
+                <th>Last Updated Date Time</th>
+                <th></th>
+            </tr>
+        </ng-template>
+        <ng-template #body let-row>
+            <tr>
+                <td>{{row.title}}</td>
+                <td>
+                    @if(row.currentTaskStatusId == TaskStatusEnum.Completed){
+                        <span class="label label-success">{{row.currentTaskStatus}}</span>
+                    }
+                    @else if(row.currentTaskStatusId == TaskStatusEnum.Pending){
+                        <span class="label label-danger">{{row.currentTaskStatus}}</span>
+                    }
+                    @else if(row.currentTaskStatusId == TaskStatusEnum.Started){
+                        <span class="label label-info">{{row.currentTaskStatus}}</span>
+                    }
+                    
+                </td>
+                <td>{{row.description}}</td>
+                <td>{{(row.dueDateTime | date: 'short') ?? "N/A"}}</td>
+                <td>{{(row.createdDateTime | date: 'short') ?? "N/A"}}</td>
+                <td>{{(row.updatedDateTime | date: 'short') ?? "N/A"}}</td>
+                <td><p-button label="View" (onClick)="onViewTask(row.taskId)" severity="secondary" size="small"></p-button></td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+
+
+</p-panel>
+
+<p-toast/>
