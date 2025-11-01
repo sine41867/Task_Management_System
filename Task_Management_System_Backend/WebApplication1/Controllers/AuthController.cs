@@ -37,6 +37,8 @@ namespace TMS_API.Controllers
                     ExecutionResultId = (int)ExecutionResultEnum.ValidationError,
                     ResponseText = "Please provide the all the required fields."
                 };
+
+                return BadRequest(result);
             }
             else
             {
@@ -49,6 +51,8 @@ namespace TMS_API.Controllers
                         ExecutionResultId = (int)ExecutionResultEnum.InvalidCredentials,
                         ResponseText = "Username or password is invalid."
                     };
+
+                    return Unauthorized(result);
                 }
                 else
                 {
@@ -89,6 +93,8 @@ namespace TMS_API.Controllers
                                 LastName = loginData.LastName
                             }
                         };
+
+                        return Ok(result);
                     }
                     else
                     {
@@ -97,11 +103,11 @@ namespace TMS_API.Controllers
                             ExecutionResultId = (int)ExecutionResultEnum.InvalidCredentials,
                             ResponseText = "Username or password is invalid."
                         };
+
+                        return Unauthorized(result);
                     }
                 }
             }
-
-            return Ok(result);
         }
     }
 }

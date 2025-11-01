@@ -14,7 +14,6 @@ import { ToastModule } from 'primeng/toast';
 import { DropdownOptionModel } from '../../../../core/models/dropdown-option-model';
 import { ApiResponseModel } from '../../../../core/models/api-response-model';
 import { TaskCommunicateService } from '../../services/task-communicate-service';
-import { Subscription } from 'rxjs';
 import { DatePipe } from '@angular/common';
 
 @Component({
@@ -67,7 +66,6 @@ export class TaskListComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.refreshListSubscription = this.taskCommunicateService.refreshList$.subscribe(this.loadList);
-    // this.loadList();
   }
 
   ngOnDestroy(): void {
@@ -106,24 +104,12 @@ export class TaskListComponent implements OnInit, OnDestroy {
 
     this.taskService.getTaskList(filterModel).subscribe({
       next: (response:ApiResponseModel) => {
-        if(response.executionResultId == ExecutionResultEnum.Success){
-          this.totalRecords.set(response.data.totalRecords);
-          this.taskList = response.data.taskList;
-          
-        }else{
-          
-          this.messageService.add({ severity: 'error', summary: 'Error', detail: response.responseText });
-
-          this.taskList = [];
-          this.totalRecords.set(0);
-
-        }
+        this.totalRecords.set(response.data.totalRecords);
+        this.taskList = response.data.taskList;
         this.loading.set(false);
       },
-      error: (error) => {
-      
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'An error occured while fetching the task list.' });
-
+      error: (err) => {
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.responseText ?? 'An error occured while fetching the task list.' });
         this.taskList = [];
         this.totalRecords.set(0);
         this.loading.set(false);
@@ -131,9 +117,4 @@ export class TaskListComponent implements OnInit, OnDestroy {
     });
 
   }
-
-
-
-
-  
 }

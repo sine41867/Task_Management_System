@@ -109,24 +109,19 @@ export class TaskFormComponent implements OnInit, OnDestroy {
       console.log(taskModel);
       this.taskService.saveTask(taskModel).subscribe({
         next: (response: ApiResponseModel) => {
-          if (response.executionResultId === ExecutionResultEnum.Success) {
-            this.taskComminicateService.triggerRefresh();
-            this.isSaving.set(false);
-            this.messageService.add({ severity: 'success', summary: 'Success', detail: response.responseText });
+          this.taskComminicateService.triggerRefresh();
+          this.isSaving.set(false);
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: response.responseText });
 
-            if (this.taskId() == null) {
-              this.taskForm.reset({ entryIdentifier: uuid() });
-            } else {
-              this.loadTask(this.taskId());
-            }
+          if (this.taskId() == null) {
+            this.taskForm.reset({ entryIdentifier: uuid() });
           } else {
-            this.isSaving.set(false);
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: response.responseText });
+            this.loadTask(this.taskId());
           }
         },
-        error: () => {
+        error: (err) => {
           this.isSaving.set(false);
-          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'An error occurred while saving the task.' });
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.responseText ?? 'An error occurred while saving the task.' });
         }
       })
     } else {
@@ -162,18 +157,14 @@ export class TaskFormComponent implements OnInit, OnDestroy {
         }
         this.taskService.deleteTask(obj).subscribe({
           next: (response: ApiResponseModel) => {
-            if (response.executionResultId == ExecutionResultEnum.Success) {
-              this.taskComminicateService.triggerRefresh();
-              this.onNewTask();
-              this.messageService.add({ severity: 'success', summary: 'Success', detail: response.responseText });
-            } else {
-              this.messageService.add({ severity: 'error', summary: 'Error', detail: response.responseText });
-            }
+            this.taskComminicateService.triggerRefresh();
+            this.onNewTask();
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: response.responseText });
             this.isDeleting.set(false);
           },
-          error: () => {
+          error: (err) => {
             this.isDeleting.set(false);
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: "An error occured while deleting the task. Please try again." });
+            this.messageService.add({ severity: 'error', summary: 'Error', detail:  err.error?.responseText ?? "An error occured while deleting the task. Please try again." });
           }
         })
       },
@@ -212,18 +203,14 @@ export class TaskFormComponent implements OnInit, OnDestroy {
         }
         this.taskService.changeTaskStatus(obj).subscribe({
           next: (response: ApiResponseModel) => {
-            if (response.executionResultId == ExecutionResultEnum.Success) {
-              this.taskComminicateService.triggerRefresh();
-              this.loadTask(this.taskId());
-              this.messageService.add({ severity: 'success', summary: 'Success', detail: response.responseText });
-            } else {
-              this.messageService.add({ severity: 'error', summary: 'Error', detail: response.responseText });
-            }
+            this.taskComminicateService.triggerRefresh();
+            this.loadTask(this.taskId());
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: response.responseText });
             this.isLoading.set(false);
           },
-          error: () => {
+          error: (err) => {
             this.isLoading.set(false);
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: `An error occured while mark the task as ${this.taskViewModel.nextTaskStatus}. Please try again.` });
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.responseText ?? `An error occured while mark the task as ${this.taskViewModel.nextTaskStatus}. Please try again.` });
           }
         })
       },
@@ -240,29 +227,23 @@ export class TaskFormComponent implements OnInit, OnDestroy {
 
       this.taskService.getTaskById(taskId).subscribe({
         next: (response: ApiResponseModel) => {
-          if (response.executionResultId == ExecutionResultEnum.Success) {
-            this.isEditMode.set(false);
-            this.taskId.set(response.data.taskId);
+          this.isEditMode.set(false);
+          this.taskId.set(response.data.taskId);
 
-            this.taskForm.patchValue({
-              title: response.data.title,
-              description: response.data.description,
-              dueDateTime: new Date(response.data.dueDateTime),
-              entryIdentifier: response.data.entryIdentifier,
-              entryVersion: response.data.entryVersion
-            })
+          this.taskForm.patchValue({
+            title: response.data.title,
+            description: response.data.description,
+            dueDateTime: new Date(response.data.dueDateTime),
+            entryIdentifier: response.data.entryIdentifier,
+            entryVersion: response.data.entryVersion
+          })
 
-            this.taskViewModel = response.data;
-            this.timelineEvents = response.data.taskStatusChangeList;
-
-          } else {
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: response.responseText });
-          }
+          this.taskViewModel = response.data;
+          this.timelineEvents = response.data.taskStatusChangeList;
           this.isLoading.set(false);
         },
-        error: () => {
-          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'An error occurred while loading the task.' });
-
+        error: (err) => {
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.responseText ?? 'An error occurred while loading the task.' });
         }
       })
     }

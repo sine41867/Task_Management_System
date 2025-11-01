@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.Web.Http.Results;
 using TMS_DAL.Common;
 using TMS_DAL.Entities;
 using TMS_DAL.Interfaces.Task;
@@ -44,15 +45,41 @@ namespace TMS_API.Controllers
                     ExecutionResultId = (int)ExecutionResultEnum.ValidationError,
                     ResponseText = "Please provide the all the required fields."
                 };
+
+                return BadRequest(result);
             }
             else
             {
                 model.CurrentUserId = currentUserId;
 
                 result = await _taskRepo.SaveTask(model);
-            }
 
-            return Ok(result);
+                if(result.ExecutionResultId == (int)ExecutionResultEnum.Success)
+                {
+                    if(model.TaskId != null)
+                    {
+                        return Ok(result);
+                    }
+                    else
+                    {
+                        return Created("",result);
+                    }
+                }
+                else if(result.ExecutionResultId == (int)ExecutionResultEnum.RecordExist ||
+                    result.ExecutionResultId == (int)ExecutionResultEnum.VersionMismatch)
+                {
+                    return Conflict(result);
+                }
+                else if (result.ExecutionResultId == (int)ExecutionResultEnum.ResourceNotFound)
+                {
+                    return NotFound(result);
+                }
+                else
+                {
+                    return StatusCode(500, result);
+                }
+
+            }
         }
 
         [HttpPost]
@@ -76,15 +103,33 @@ namespace TMS_API.Controllers
                     ExecutionResultId = (int)ExecutionResultEnum.ValidationError,
                     ResponseText = "There is a validation error. Please try again."
                 };
+
+                return BadRequest(result);
             }
             else
             {
                 model.CurrentUserId = currentUserId;
 
                 result = await _taskRepo.DeleteTask(model);
+
+                if (result.ExecutionResultId == (int)ExecutionResultEnum.Success)
+                {
+                    return Ok(result);
+                }
+                else if (result.ExecutionResultId == (int)ExecutionResultEnum.VersionMismatch)
+                {
+                    return Conflict(result);
+                }
+                else if (result.ExecutionResultId == (int)ExecutionResultEnum.ResourceNotFound)
+                {
+                    return NotFound(result);
+                }
+                else
+                {
+                    return StatusCode(500, result);
+                }
             }
 
-            return Ok(result);
         }
 
         [HttpPost]
@@ -108,15 +153,32 @@ namespace TMS_API.Controllers
                     ExecutionResultId = (int)ExecutionResultEnum.ValidationError,
                     ResponseText = "There is a validation error. Please try again."
                 };
+
+                return BadRequest(result);
             }
             else
             {
                 model.CurrentUserId = currentUserId;
 
                 result = await _taskRepo.ChangeTaskStatus(model);
-            }
 
-            return Ok(result);
+                if (result.ExecutionResultId == (int)ExecutionResultEnum.Success)
+                {
+                    return Ok(result);
+                }
+                else if (result.ExecutionResultId == (int)ExecutionResultEnum.VersionMismatch)
+                {
+                    return Conflict(result);
+                }
+                else if (result.ExecutionResultId == (int)ExecutionResultEnum.ResourceNotFound)
+                {
+                    return NotFound(result);
+                }
+                else
+                {
+                    return StatusCode(500, result);
+                }
+            }
         }
 
         [HttpGet]
@@ -135,13 +197,25 @@ namespace TMS_API.Controllers
 
             var task = await _taskRepo.GetTaskById(taskId, currentUserId);
 
-            if(task == null)
+            if (task == null)
+            {
+                result = new ExecutionResponseModel()
+                {
+                    ExecutionResultId = (int)ExecutionResultEnum.ResourceNotFound,
+                    ResponseText = "An error has occured while processing your request. Please contact your administrator if this repeatedly occurs."
+                };
+
+                return StatusCode(500,result);
+            }
+            else if (task.TaskId == null)
             {
                 result = new ExecutionResponseModel()
                 {
                     ExecutionResultId = (int)ExecutionResultEnum.ResourceNotFound,
                     ResponseText = "The Task, you are requesting is no found. Please try again."
                 };
+
+                return NotFound(result);
             }
             else
             {
@@ -150,9 +224,10 @@ namespace TMS_API.Controllers
                     ExecutionResultId = (int)ExecutionResultEnum.Success,
                     Data = task
                 };
+
+                return Ok(result);
             }
 
-            return Ok(result);
         }
 
         [HttpPost]
@@ -180,6 +255,8 @@ namespace TMS_API.Controllers
                     ExecutionResultId = (int)ExecutionResultEnum.InternalServerError,
                     ResponseText = "There was an error while fetching the task list. Please try again."
                 };
+
+                return StatusCode(500,result);
             }
             else
             {
@@ -188,9 +265,9 @@ namespace TMS_API.Controllers
                     ExecutionResultId = (int)ExecutionResultEnum.Success,
                     Data = taskListModel
                 };
-            }
 
-            return Ok(result);
+                return Ok(result);
+            }
         }
     }
 }

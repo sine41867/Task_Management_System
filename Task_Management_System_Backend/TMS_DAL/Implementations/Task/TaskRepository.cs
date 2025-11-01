@@ -68,6 +68,7 @@ namespace TMS_DAL.Implementations.Task
                 task.CurrentTaskStatusId = nextStatusId;
                 task.UpdatedDateTime = DateTimeOffset.UtcNow;
                 task.UpdatedBy = model.CurrentUserId;
+                task.EntryVersion++;
 
                 await _dbContext.SaveChangesAsync();
 
@@ -147,7 +148,7 @@ namespace TMS_DAL.Implementations.Task
 
                 if(task == null)
                 {
-                    return null;
+                    return new TaskModel();
                 }
 
                 return new TaskModel()
@@ -171,10 +172,6 @@ namespace TMS_DAL.Implementations.Task
                     .OrderByDescending(x=> x.TimeStamp)
                     .ToList()
                 };
-
-                
-
-                
             }
             catch (Exception ex)
             {

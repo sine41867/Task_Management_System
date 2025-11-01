@@ -58,16 +58,12 @@ export class LoginComponent implements OnInit {
 
       this.authService.login(obj).subscribe({
         next:(response:ApiResponseModel) =>{
-          if(response.executionResultId == ExecutionResultEnum.Success){
-            this.router.navigateByUrl("/task");
-          }else{
-            this.messageService.add({severity:'error', summary: 'Error', detail: response.responseText});
-          }
+          this.router.navigateByUrl("/task");
           this.isLoading.set(false);
         },
-        error:()=>{
+        error:(err)=>{
           this.isLoading.set(false);
-          this.messageService.add({severity:'error', summary: 'Error', detail: 'An error occured while login.'});
+          this.messageService.add({severity:'error', summary: 'Error', detail: err.error?.responseText ?? 'An error occured while login.'});
         }
       })
 
