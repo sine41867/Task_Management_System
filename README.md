@@ -42,3 +42,7 @@ Check out the full demo on YouTube: [Watch Demo](https://youtu.be/ZcjsuKTwa1A)
 1. Clone the repository:  
    ```bash
    git clone https://github.com/yourusername/task-management-system.git
+
+2. Credentials:
+   Username - Admin
+   Password - Admin123
